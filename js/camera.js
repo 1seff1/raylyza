@@ -10,7 +10,7 @@ class Camera {
         this.imageData = null;
         this.cameraCenter = new Vec3(0, 0, 0);
         this.context = null;
-        this.samplesPerPixel = 100.0;
+        this.samplesPerPixel = 10.0;
         this.pixelSamplesScale = 1.0 / this.samplesPerPixel;
     }
 
