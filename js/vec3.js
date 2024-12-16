@@ -59,7 +59,13 @@ class Vec3 {
         );
     }
 
-    random() {
-        return new Vec3(Math.random(-1, 1))
+    nearZero() {
+        const s = 1e-8;
+        return Math.abs(this.x) < s && Math.abs(this.y) < s && Math.abs(this.z) < s;
     }
+
+    reflect(n) {
+        return this.minus(n.multiply(2 * this.dot(n)));
+    }
+
 }

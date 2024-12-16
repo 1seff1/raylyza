@@ -25,6 +25,14 @@ class Color {
             this.b / scalar);
     }
 
+    multiplyColor(color) {
+        return new Color(
+            this.r * color.r,
+            this.g * color.g,
+            this.b * color.b
+        );
+    }
+
     clamp() {
         this.r = Math.max(0, Math.min(this.r, 1));
         this.g = Math.max(0, Math.min(this.g, 1));

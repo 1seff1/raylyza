@@ -3,6 +3,7 @@ class HitRecord {
         this.p = p;
         this.t = t;
         this.normal = new Vec3(0, 0, 0);
+        this.material = null;
         this.frontFace = false;
     }
 

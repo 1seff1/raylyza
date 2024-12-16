@@ -1,7 +1,8 @@
 class Sphere {
-    constructor(center, radius) {
+    constructor(center, radius, material) {
         this.center = center;
         this.radius = radius;
+        this.material = material;
     }
 
     hit(ray, tMin, tMax, hitRecord) {
@@ -29,6 +30,7 @@ class Sphere {
 
         hitRecord.t = root;
         hitRecord.p = ray.pointAt(hitRecord.t);
+        hitRecord.material = this.material;
         const outwardNormal = hitRecord.p.minus(this.center).divide(this.radius);
         hitRecord.setFaceNormal(ray, outwardNormal);
 

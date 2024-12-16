@@ -12,6 +12,7 @@ class Camera {
         this.context = null;
         this.samplesPerPixel = 10.0;
         this.pixelSamplesScale = 1.0 / this.samplesPerPixel;
+        this.maxDepth = 10;
     }
 
     initialize() {
@@ -49,7 +50,7 @@ class Camera {
 
                 for (let i = 0; i < this.samplesPerPixel; i++) {
                     const ray = this.getRay(w, h);
-                    pixelColor = pixelColor.add(this.getColor(ray, world));
+                    pixelColor = pixelColor.add(this.getColor(ray, world, this.maxDepth));
                 }
                 this.setPixel(this.imageData, w, h, pixelColor.r * this.pixelSamplesScale, pixelColor.g * this.pixelSamplesScale, pixelColor.b * this.pixelSamplesScale, 1);
             }
@@ -58,13 +59,18 @@ class Camera {
         this.context.putImageData(this.imageData, 0, 0)
     }
 
-    getColor(ray, world) {
+    getColor(ray, world, depth) {
+
+        if (depth < 0) {
+            return new Color(0, 0, 0);
+        }
+
         let record = new HitRecord();
         let hitAnything = false;
         let closest = 100000;
 
         for (let i = 0; i < world.length; i++) {
-            if (world[i].hit(ray, 0, closest, record)) {
+            if (world[i].hit(ray, 0.001, closest, record)) {
                 hitAnything = true;
                 closest = record.t;
             }
@@ -76,10 +82,15 @@ class Camera {
             return new Color(1.0, 1.0, 1.0).multiply((1.0 - a)).add(new Color(0.5, 0.7, 1.0).multiply(a));
         }
 
-        const direction = randomOnHemisphere(record.normal);
-        const color = this.getColor(new Ray(record.p, direction), world);
+        let scattered = new Ray(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+        let attenuation = new Color(0, 0, 0);
+        
+        var result = record.material.scatter(ray, record, attenuation, scattered);
+        if (result.scatter) {
+            return this.getColor(result.scattered, world, depth - 1).multiplyColor(result.attenuation);
+        }
 
-        return color.multiply(0.5);
+        return new Color(0, 0, 0);
     }
 
     getRay(w, h) {
@@ -99,9 +110,22 @@ class Camera {
 
     setPixel(imageData, x, y, r, g, b, a) {
         const index = 4 * (x + y * imageData.width);
-        imageData.data[index + 0] = r * 255;
-        imageData.data[index + 1] = g * 255;
-        imageData.data[index + 2] = b * 255;
+
+        const rGamma = this.linearToGamma(r);
+        const gGamma = this.linearToGamma(g);
+        const bGamma = this.linearToGamma(b);
+
+        imageData.data[index + 0] = rGamma * 255;
+        imageData.data[index + 1] = gGamma * 255;
+        imageData.data[index + 2] = bGamma * 255;
         imageData.data[index + 3] = a * 255;
+    }
+
+    linearToGamma(linear) {
+        if (linear > 0) {
+            return Math.sqrt(linear);
+        }
+
+        return 0;
     }
 }
