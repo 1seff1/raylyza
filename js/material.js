@@ -22,17 +22,19 @@ class Lambertian {
 }
 
 class Metal {
-    constructor(albedo) {
+    constructor(albedo, fuzz) {
         this.albedo = albedo;
+        this.fuzz = fuzz;
     }
 
     scatter(rayIn, hitRecord, attenuation, scattered) {
-        const reflected = rayIn.direction.reflect(hitRecord.normal);
+        let reflected = rayIn.direction.reflect(hitRecord.normal);
+        reflected = reflected.normalize().add(randomUnitVector().multiply(this.fuzz));
         scattered = new Ray(hitRecord.p, reflected);
         attenuation = this.albedo;
         
         return {
-            scatter: true,
+            scatter: scattered.direction.dot(hitRecord.normal) > 0,
             scattered: scattered,
             attenuation: attenuation
         }

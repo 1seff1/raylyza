@@ -1,7 +1,7 @@
 const ground = new Lambertian(new Color(0.8, 0.6, 0.2));
 const center = new Lambertian(new Color(0.1, 0.2, 0.5));
-const left = new Metal(new Color(0.8, 0.8, 0.8));
-const right = new Metal(new Color(0.8, 0.6, 0.2));
+const left = new Metal(new Color(0.8, 0.8, 0.8), 0.3);
+const right = new Metal(new Color(0.8, 0.3, 0.2), .1);
 
 const world = [
     new Sphere(new Vec3(0.0, -100.5, -1.0), 100, ground),
